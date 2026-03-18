@@ -31,8 +31,18 @@ function calculatePremium(city, avgDailyIncome, workingHours) {
   const rawPremium = 10 + (riskScore * 0.6 + hoursModifier * 0.25 + incomeModifier * 0.15) * 40;
   const premium = Math.round(Math.min(Math.max(rawPremium, 10), 50));
 
+  // Generate explainability string based on primary risk factors
+  let primaryRisk = [];
+  if (profile.rain > 0.6) primaryRisk.push("heavy rainfall");
+  if (profile.heat > 0.6) primaryRisk.push("extreme heat");
+  if (profile.aqi > 0.6) primaryRisk.push("poor air quality");
+  const reasonText = primaryRisk.length > 0 
+    ? `Your premium is ₹${premium} because your area has high risks for ${primaryRisk.join(' and ')}.`
+    : `Your premium is ₹${premium} based on a standard risk profile for your area.`;
+
   return {
     premium,
+    message: reasonText,
     riskScore: Math.round(riskScore * 100) / 100,
     factors: {
       rain: profile.rain,
@@ -47,17 +57,61 @@ function calculatePremium(city, avgDailyIncome, workingHours) {
  * Calculate income loss for a given trigger
  */
 function calculateIncomeLoss(triggerType, avgDailyIncome, workingHours) {
-  const lossFactors = {
-    heavy_rain: 0.7,  // 70% income loss on heavy rain day
-    high_temp:  0.5,  // 50% income loss on extreme heat day
-    poor_aqi:   0.6,  // 60% income loss on poor AQI day
+  // Determine hours effectively lost due to the disaster severity
+  const lostHoursMap = {
+    heavy_rain: Math.min(workingHours, 6),  // e.g. 6 hours unable to deliver
+    high_temp:  Math.min(workingHours, 4),  // e.g. 4 hours afternoon heat blocked
+    poor_aqi:   Math.min(workingHours, 5),  // e.g. 5 hours smog blocked
   };
 
-  const factor = lossFactors[triggerType] || 0.5;
-  // Loss for affected days (assume 2 days affected per trigger event)
-  const dailyLoss = avgDailyIncome * factor;
-  const totalLoss = Math.round(dailyLoss * 2);
-  return totalLoss;
+  const hoursLost = lostHoursMap[triggerType] || 4;
+  
+  // Calculate exact hourly rate
+  const hourlyIncome = avgDailyIncome / workingHours;
+  
+  // Total projected loss
+  const totalLoss = Math.round(hourlyIncome * hoursLost);
+  
+  return {
+    totalLoss,
+    hoursLost,
+    hourlyIncome: Math.round(hourlyIncome)
+  };
 }
 
-module.exports = { calculatePremium, calculateIncomeLoss };
+/**
+ * Predictive Intelligence Mock
+ * Forecast 24-hour future risk and calculate estimated vulnerability.
+ */
+function predictNextDayRisk(city, avgDailyIncome, workingHours) {
+  const cityKey = city.toLowerCase();
+  const profile = db.cityRiskProfiles[cityKey];
+  
+  if (!profile) return null;
+
+  // Add some randomness to predict tomorrow
+  const mockPredictions = [
+    { type: 'heavy_rain', risk: profile.rain + Math.random()*0.3, label: "Heavy Rain", impactFactor: 6 },
+    { type: 'high_temp', risk: profile.heat + Math.random()*0.3, label: "High Temperature", impactFactor: 4 },
+    { type: 'poor_aqi', risk: profile.aqi + Math.random()*0.3, label: "Poor AQI", impactFactor: 5 }
+  ];
+  
+  // Find highest risk
+  mockPredictions.sort((a,b) => b.risk - a.risk);
+  const topRisk = mockPredictions[0];
+  
+  if (topRisk.risk > 0.65) {
+    const hourlyIncome = avgDailyIncome / workingHours;
+    const estLoss = Math.round(hourlyIncome * topRisk.impactFactor);
+    return {
+      alert: true,
+      message: `High chance of ${topRisk.label.toLowerCase()} tomorrow. Estimated income loss ₹${estLoss}.`,
+      suggestion: `Increase your coverage for tomorrow`,
+      estLoss
+    };
+  }
+  
+  return { alert: false, message: "Weather looks clear tomorrow. Safe deliveries!", suggestion: "" };
+}
+
+module.exports = { calculatePremium, calculateIncomeLoss, predictNextDayRisk };

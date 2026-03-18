@@ -6,6 +6,7 @@ const policyRoutes = require('./routes/policy');
 const triggerRoutes = require('./routes/triggers');
 const claimRoutes = require('./routes/claims');
 const adminRoutes = require('./routes/admin');
+const gamificationRoutes = require('./routes/gamification');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,6 +21,7 @@ app.use('/api/policy', policyRoutes);
 app.use('/api/triggers', triggerRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

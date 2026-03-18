@@ -51,12 +51,15 @@ router.post('/simulate', authMiddleware, (req, res) => {
 
   const currentValue = simulatedValues[triggerType][triggerConfig.field];
 
-  // Run fraud checks
+  // 1. Strict Parametric Validation
+  const conditionMet = currentValue > triggerConfig.threshold;
+
+  // Run fraud checks (only relevant if condition met, but we can run it anyway to log)
   const fraudResult = runFraudChecks(user.id, triggerType, user);
 
   // Calculate income loss
-  const incomeLoss = calculateIncomeLoss(triggerType, user.avgDailyIncome, user.workingHours);
-
+  const lossDetails = calculateIncomeLoss(triggerType, user.avgDailyIncome, user.workingHours);
+  const incomeLoss = lossDetails.totalLoss;
   // Create trigger record
   const trigger = {
     id: uuidv4(),
@@ -94,6 +97,36 @@ router.post('/simulate', authMiddleware, (req, res) => {
       payout: null,
       message: '⚠️ Claim rejected due to fraud detection.',
       fraudChecks: fraudResult.checks,
+      currentValue,
+      threshold: triggerConfig.threshold
+    });
+  }
+
+  // If condition not met, reject
+  if (!conditionMet) {
+    const claim = {
+      id: uuidv4(),
+      userId: user.id,
+      policyId: policy.id,
+      triggerId: trigger.id,
+      triggerType,
+      triggerLabel: triggerConfig.label,
+      incomeLoss: 0,
+      status: 'rejected',
+      fraudChecks: fraudResult.checks,
+      reason: 'Threshold not met',
+      createdAt: Date.now(),
+    };
+    db.claims.push(claim);
+
+    return res.json({
+      trigger,
+      claim,
+      payout: null,
+      message: `Condition not met (${currentValue}${triggerConfig.unit} vs required >${triggerConfig.threshold}${triggerConfig.unit}). No payout.`,
+      fraudChecks: fraudResult.checks,
+      currentValue,
+      threshold: triggerConfig.threshold
     });
   }
 
@@ -129,7 +162,10 @@ router.post('/simulate', authMiddleware, (req, res) => {
     trigger,
     claim,
     payout,
-    message: `✅ Claim approved! ₹${incomeLoss} credited to your UPI account.`,
+    lossDetails,
+    currentValue,
+    threshold: triggerConfig.threshold,
+    message: `✅ Claim approved! You lost ${lossDetails.hoursLost} hours today. ₹${incomeLoss} credited to your UPI account.`,
     fraudChecks: fraudResult.checks,
   });
 });

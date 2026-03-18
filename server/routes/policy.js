@@ -2,7 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
-const { calculatePremium } = require('../services/riskEngine');
+const { calculatePremium, predictNextDayRisk } = require('../services/riskEngine');
 
 const router = express.Router();
 
@@ -12,7 +12,9 @@ router.get('/premium', authMiddleware, (req, res) => {
   if (!user) return res.status(404).json({ error: 'User not found.' });
 
   const result = calculatePremium(user.city, user.avgDailyIncome, user.workingHours);
-  res.json(result);
+  const prediction = predictNextDayRisk(user.city, user.avgDailyIncome, user.workingHours);
+  
+  res.json({ ...result, prediction });
 });
 
 // POST /api/policy/subscribe — subscribe to weekly plan
@@ -22,10 +24,10 @@ router.post('/subscribe', authMiddleware, (req, res) => {
 
   // Check if user already has an active policy
   const activePolicy = db.policies.find(
-    (p) => p.userId === user.id && p.status === 'active'
+    (p) => p.userId === user.id && (p.status === 'active' || p.status === 'ACTIVE')
   );
   if (activePolicy) {
-    return res.status(400).json({ error: 'You already have an active policy.', policy: activePolicy });
+    return res.status(200).json({ message: 'You already have an active policy.', policy: activePolicy });
   }
 
   const { premium } = calculatePremium(user.city, user.avgDailyIncome, user.workingHours);
@@ -35,7 +37,7 @@ router.post('/subscribe', authMiddleware, (req, res) => {
     userId: user.id,
     city: user.city,
     weeklyPremium: premium,
-    status: 'active',
+    status: 'ACTIVE',
     startDate: Date.now(),
     endDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
     createdAt: Date.now(),
@@ -45,10 +47,10 @@ router.post('/subscribe', authMiddleware, (req, res) => {
   res.status(201).json({ message: 'Policy activated successfully!', policy });
 });
 
-// GET /api/policy/active — get current active policy
-router.get('/active', authMiddleware, (req, res) => {
+// GET /api/policy/active or /api/policy — get current active policy
+router.get(['/active', '/'], authMiddleware, (req, res) => {
   const policy = db.policies.find(
-    (p) => p.userId === req.user.id && p.status === 'active'
+    (p) => p.userId === req.user.id && (p.status === 'active' || p.status === 'ACTIVE')
   );
   if (!policy) {
     return res.json({ policy: null });

@@ -29,28 +29,76 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <div className="brand-icon">🛡️</div>
-          <h1>Welcome Back</h1>
-          <p>Log in to your Zomato Shield account</p>
+    <div style={{ minHeight: '100vh', background: '#fcfcfc', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <div style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <button style={{ position: 'absolute', left: '20px', background: '#fff0f1', color: '#e23744', border: 'none', width: '32px', height: '32px', borderRadius: '50%', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', cursor: 'pointer' }}>×</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: '24px', height: '24px', background: '#e23744', borderRadius: '6px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>🛡️</div>
+          <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1c1c1c' }}>Zomato Shield</span>
         </div>
-        {error && <div className="alert alert-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="login-email">Email</label>
-            <input id="login-email" name="email" type="email" placeholder="rajesh@email.com" value={form.email} onChange={handleChange} required />
+      </div>
+
+      <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        
+        {/* Shield Graphic */}
+        <div style={{ 
+          width: '100px', height: '100px', 
+          background: '#fff0f1', borderRadius: '24px', 
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 10px 30px rgba(226, 55, 68, 0.1)', marginBottom: '24px' 
+        }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '4px' }}>🛡️</div>
+          <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#1c1c1c' }}>AI Protection</span>
+        </div>
+
+        <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#1c1c1c', marginBottom: '8px' }}>Log In</h1>
+        <p style={{ fontSize: '0.9rem', color: '#6b7280', marginBottom: '32px' }}>Protect your daily earnings with AI</p>
+
+        {error && <div style={{ width: '100%', background: '#fee2e2', color: '#991b1b', padding: '12px', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '16px', textAlign: 'center' }}>{error}</div>}
+
+        <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#4b5563' }}>Email</label>
+            <input 
+              name="email" type="email" value={form.email} onChange={handleChange} required
+              placeholder="rajesh@zomato.com"
+              style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid #e5e7eb', background: '#fff', fontSize: '1rem', outline: 'none' }}
+              onFocus={(e) => e.target.style.borderColor = '#e23744'}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+            />
           </div>
-          <div className="form-group">
-            <label htmlFor="login-password">Password</label>
-            <input id="login-password" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} required />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+             <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#4b5563' }}>Password</label>
+             <input 
+               name="password" type="password" value={form.password} onChange={handleChange} required
+               placeholder="••••••••"
+               style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid #e5e7eb', background: '#fff', fontSize: '1rem', outline: 'none' }}
+               onFocus={(e) => e.target.style.borderColor = '#e23744'}
+               onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+             />
           </div>
-          <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
-            {loading ? <span className="spinner"></span> : 'Log In'}
+
+          <button type="submit" disabled={loading} style={{ 
+            width: '100%', padding: '18px', background: '#e23744', color: '#fff', 
+            border: 'none', borderRadius: '100px', fontSize: '1.1rem', fontWeight: '700', 
+            marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: '0 8px 20px rgba(226, 55, 68, 0.25)'
+          }}>
+             {loading ? <span className="spinner"></span> : <>
+               ⚡ Log In
+             </>}
           </button>
         </form>
-        <p className="auth-footer">New to Zomato Shield? <Link to="/signup">Create an account</Link></p>
+
+        <p style={{ marginTop: '24px', fontSize: '0.8rem', color: '#9ca3af' }}>
+          By continuing, you agree to our <span style={{ color: '#e23744', fontWeight: '600' }}>Terms of Service</span>
+        </p>
+
+        <p style={{ marginTop: 'auto', fontSize: '0.9rem', color: '#4b5563' }}>
+          Don't have an account? <Link to="/signup" style={{ color: '#e23744', fontWeight: '700', textDecoration: 'none' }}>Sign Up</Link>
+        </p>
       </div>
     </div>
   );

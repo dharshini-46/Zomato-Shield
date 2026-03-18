@@ -11,36 +11,33 @@ function runFraudChecks(userId, triggerType, user) {
   const checks = [];
   let fraudDetected = false;
 
-  // 1. GPS Mismatch (simulated — 5% random flag)
-  const gpsMismatch = Math.random() < 0.05;
-  checks.push({
-    check: 'GPS Location Verification',
-    passed: !gpsMismatch,
-    detail: gpsMismatch
-      ? 'GPS location does not match registered city'
-      : 'GPS location verified — matches registered city',
-  });
-  if (gpsMismatch) fraudDetected = true;
-
-  // 2. Duplicate Claims
+  // 1. Multiple claims in same day (Max 2 allowed per day context)
   const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-  const duplicate = db.claims.some(
-    (c) =>
-      c.userId === userId &&
-      c.triggerType === triggerType &&
-      c.createdAt > oneDayAgo
-  );
+  const recentClaims = db.claims.filter(c => c.userId === userId && c.createdAt > oneDayAgo);
+  
+  const tooManyClaims = recentClaims.length >= 2;
   checks.push({
-    check: 'Duplicate Claim Detection',
+    check: 'Abnormal Claim Volume',
+    passed: !tooManyClaims,
+    detail: tooManyClaims
+      ? `Suspicious activity detected: User has already filed ${recentClaims.length} claims in the last 24 hours.`
+      : 'Claim frequency within normal bounds.'
+  });
+  if (tooManyClaims) fraudDetected = true;
+
+  // 2. Duplicate Claims for same condition
+  const duplicate = recentClaims.some(c => c.triggerType === triggerType);
+  checks.push({
+    check: 'Duplicate Condition Prevention',
     passed: !duplicate,
     detail: duplicate
-      ? 'A claim for this trigger type was already filed in the last 24 hours'
-      : 'No duplicate claims found within 24-hour window',
+      ? 'Suspicious activity detected: A claim for this exact condition was already filed today.'
+      : 'Condition verified as a unique unhandled event.'
   });
   if (duplicate) fraudDetected = true;
 
   // 3. Unreal Working Hours
-  const unrealHours = user.workingHours > 16;
+  const unrealHours = user.workingHours > 16 || user.workingHours <= 0;
   checks.push({
     check: 'Working Hours Validation',
     passed: !unrealHours,

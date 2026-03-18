@@ -1,29 +1,54 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import Admin from './pages/Admin';
-import { getToken } from './api';
+import History from './pages/History';
+import ShieldTab from './pages/ShieldTab';
+import MapTab from './pages/MapTab';
+import Verify from './pages/Verify';
+import Help from './pages/Help';
+import BottomNav from './components/BottomNav';
+import { getToken, getIsVerified } from './api';
 import './index.css';
 
 function ProtectedRoute({ children }) {
-  return getToken() ? children : <Navigate to="/login" replace />;
+  if (!getToken()) return <Navigate to="/login" replace />;
+  // Require verification for main app pages if not already on verify
+  if (!getIsVerified() && window.location.pathname !== '/verify') return <Navigate to="/verify" replace />;
+  return children;
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isVerifyPage = location.pathname === '/verify';
+  const isAuthenticated = !!getToken();
+
+  return (
+    <>
+      <main className="main-content">
+        <Routes>
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+          <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />} />
+          <Route path="/verify" element={isAuthenticated ? (getIsVerified() ? <Navigate to="/dashboard" replace /> : <Verify />) : <Navigate to="/login" replace />} />
+          <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
+          
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+          <Route path="/shield" element={<ProtectedRoute><ShieldTab /></ProtectedRoute>} />
+          <Route path="/map" element={<ProtectedRoute><MapTab /></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </main>
+      {!isAuthPage && !isVerifyPage && isAuthenticated && getIsVerified() && <BottomNav />}
+    </>
+  );
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <main className="main-content">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </main>
+      <AppContent />
     </BrowserRouter>
   );
 }

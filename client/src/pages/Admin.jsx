@@ -156,40 +156,102 @@ export default function Admin() {
         </div>
 
         <div className="dashboard-col">
-          {/* Approval Rate */}
-          <div className="card">
-            <div className="card-header"><h2>📊 Approval Rate</h2></div>
-            <div className="card-body">
-              <div className="approval-ring">
-                <svg viewBox="0 0 120 120" className="ring-svg">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
-                  <circle
-                    cx="60" cy="60" r="50" fill="none"
-                    stroke="#22c55e"
-                    strokeWidth="10"
-                    strokeDasharray={`${((stats?.approvedClaims || 0) / Math.max(stats?.totalClaims || 1, 1)) * 314} 314`}
-                    strokeLinecap="round"
-                    transform="rotate(-90 60 60)"
-                  />
-                  <text x="60" y="56" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">
-                    {stats?.totalClaims
-                      ? Math.round((stats.approvedClaims / stats.totalClaims) * 100)
-                      : 0}%
-                  </text>
-                  <text x="60" y="74" textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="11">
-                    approved
-                  </text>
-                </svg>
+          {/* Approval Rate & Risk Prediction Grid */}
+          <div className="form-row">
+            {/* Approval Rate */}
+            <div className="card">
+              <div className="card-header"><h2>📊 Approval Rate</h2></div>
+              <div className="card-body">
+                <div className="approval-ring">
+                  <svg viewBox="0 0 120 120" className="ring-svg">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+                    <circle
+                      cx="60" cy="60" r="50" fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="10"
+                      strokeDasharray={`${((stats?.approvedClaims || 0) / Math.max(stats?.totalClaims || 1, 1)) * 314} 314`}
+                      strokeLinecap="round"
+                      transform="rotate(-90 60 60)"
+                    />
+                    <text x="60" y="56" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">
+                      {stats?.totalClaims
+                        ? Math.round((stats.approvedClaims / stats.totalClaims) * 100)
+                        : 0}%
+                    </text>
+                    <text x="60" y="74" textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="11">
+                      approved
+                    </text>
+                  </svg>
+                </div>
+                <div className="approval-details">
+                  <span className="text-success">✅ {stats?.approvedClaims || 0}</span>
+                  <span className="text-error">❌ {stats?.rejectedClaims || 0}</span>
+                </div>
               </div>
-              <div className="approval-details">
-                <span className="text-success">✅ {stats?.approvedClaims || 0} approved</span>
-                <span className="text-error">❌ {stats?.rejectedClaims || 0} rejected</span>
+            </div>
+
+            {/* Next-Day Risk Predictions */}
+            <div className="card prediction-card alert-high">
+              <div className="card-header"><h2>🔮 System Alert Map</h2></div>
+              <div className="card-body p-4">
+                 <p className="text-sm text-error font-medium mb-2">High-Risk Zones (Next 24 Hrs)</p>
+                 <ul className="text-sm mt-3" style={{ listStyle: 'none', lineHeight: '2' }}>
+                   <li>🔥 <strong>Delhi:</strong> Extreme Heat forecasted</li>
+                   <li>🌧️ <strong>Mumbai:</strong> Heavy Rainfall warning</li>
+                   <li>💨 <strong>Gurgaon:</strong> Severe AQI degradation</li>
+                 </ul>
+                 <p className="suggestion-text text-xs mt-3">Expected +35% rise in parametric approvals.</p>
               </div>
             </div>
           </div>
 
+          {/* Recent Fraud Alerts */}
+          <div className="card mt-4">
+            <div className="card-header">
+              <div className="flex justify-between align-center">
+                <h2>🚨 Recent Fraud Alerts</h2>
+                <span className="badge badge-error">Top Priority</span>
+              </div>
+            </div>
+            <div className="card-body p-0">
+              {claims.filter(c => c.reason && c.reason.toLowerCase().includes('fraud')).length === 0 ? (
+                <div className="empty-state p-6 text-center text-muted">
+                  <p>No active fraud intercepts.</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>City</th>
+                        <th>Claim Attempt</th>
+                        <th>AI Flag Result</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {claims
+                        .filter(c => c.reason && c.reason.toLowerCase().includes('fraud'))
+                        .slice(0, 5)
+                        .map((c) => (
+                          <tr key={c.id}>
+                            <td className="font-medium text-error">{c.userName}</td>
+                            <td>{c.userCity}</td>
+                            <td>{triggerLabels[c.triggerType] || c.triggerType}</td>
+                            <td className="text-xs text-muted">
+                                {c.fraudChecks?.find(fc => !fc.passed)?.detail || 'AI Check Failed'}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Recent Claims Table */}
-          <div className="card">
+          <div className="card mt-4">
             <div className="card-header"><h2>📜 Recent Claims</h2></div>
             <div className="card-body">
               {claims.length === 0 ? (
