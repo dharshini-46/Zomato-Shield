@@ -1,4 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+/* Leaflet Map Fix */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  z-index: 1;
+}
+.leaflet-control-attribution {
+  font-size: 9px !important;
+}
 
 /* ============================
    Design Tokens (Stitch UI)

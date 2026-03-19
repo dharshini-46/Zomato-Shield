@@ -1,13 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import History from './pages/History';
-import ShieldTab from './pages/ShieldTab';
-import MapTab from './pages/MapTab';
 import Verify from './pages/Verify';
 import Help from './pages/Help';
-import BottomNav from './components/BottomNav';
 import { getToken, getIsVerified } from './api';
 import './index.css';
 
@@ -29,18 +24,13 @@ function AppContent() {
       <main className="main-content">
         <Routes>
           <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
-          <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />} />
           <Route path="/verify" element={isAuthenticated ? (getIsVerified() ? <Navigate to="/dashboard" replace /> : <Verify />) : <Navigate to="/login" replace />} />
           <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
           
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-          <Route path="/shield" element={<ProtectedRoute><ShieldTab /></ProtectedRoute>} />
-          <Route path="/map" element={<ProtectedRoute><MapTab /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
-      {!isAuthPage && !isVerifyPage && isAuthenticated && getIsVerified() && <BottomNav />}
     </>
   );
 }
