@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { useApp } from '../../AppContext';
 
+const Icons = {
+  Rain: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>,
+  Heat: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>,
+  Star: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  Shield: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  Check: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+};
+
 const PLANS = [
-  { id: 'Basic', price: 29, icon: '🌧️', coverage: '50% income protection', features: ['Covers heavy rain', 'Instant payout', 'AI risk detection'], recommended: false },
-  { id: 'Standard', price: 49, icon: '☀️', coverage: '80% income protection', features: ['Rain + extreme heat cover', 'Instant payout', 'AI risk detection', 'Weekly reports'], recommended: true },
-  { id: 'Premium', price: 79, icon: '💎', coverage: '100% income protection', features: ['Rain, heat & pollution cover', 'Instant payout', 'AI risk detection', 'Priority claims', '24/7 support'], recommended: false },
+  { id: 'Basic', price: 29, icon: Icons.Rain, coverage: '50% income protection', features: ['Covers heavy rain', 'Instant payout', 'AI risk detection'], recommended: false },
+  { id: 'Standard', price: 49, icon: Icons.Heat, coverage: '80% income protection', features: ['Rain + extreme heat cover', 'Instant payout', 'AI risk detection', 'Weekly reports'], recommended: true },
+  { id: 'Premium', price: 79, icon: Icons.Star, coverage: '100% income protection', features: ['Rain, heat & pollution cover', 'Instant payout', 'AI risk detection', 'Priority claims', '24/7 support'], recommended: false },
 ];
 
 export default function PolicyTab({ setActiveTab }) {
@@ -33,7 +41,7 @@ export default function PolicyTab({ setActiveTab }) {
       {/* SUCCESS STATE */}
       {success && (
         <div style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: '24px', padding: '20px 24px', marginBottom: '24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>{Icons.Check}</div>
           <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#166534' }}>Policy subscribed successfully!</div>
           <div style={{ fontSize: '0.85rem', color: '#16a34a', marginTop: '4px' }}>Your {selectedPlan} Shield plan is now active.</div>
         </div>
@@ -75,7 +83,7 @@ export default function PolicyTab({ setActiveTab }) {
           {/* Icon + Intro */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{ width: '56px', height: '56px', background: '#fff0f1', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e23744', margin: '0 auto 16px auto' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {Icons.Shield}
             </div>
             <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#111827', margin: '0 0 8px 0' }}>Protect Your Earnings</h2>
             <p style={{ fontSize: '0.9rem', color: '#6b7280', lineHeight: '1.5', padding: '0 16px', margin: 0 }}>Get paid even when weather stops you. Choose a plan that fits.</p>
@@ -106,7 +114,7 @@ export default function PolicyTab({ setActiveTab }) {
                         <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: '500' }}>/week</span>
                       </div>
                     </div>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>{plan.icon}</div>
+                    <div style={{ width: '44px', height: '44px', color: '#111827', borderRadius: '50%', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{plan.icon}</div>
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {plan.features.map((f, i) => (

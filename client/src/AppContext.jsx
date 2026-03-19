@@ -4,10 +4,10 @@ import { getUser } from './api';
 const AppContext = createContext(null);
 
 const INITIAL_CLAIMS = [
-  { id: 1, type: 'Heavy Rain', date: 'Jul 12', status: 'Accepted', amount: 320, icon: '🌧️' },
-  { id: 2, type: 'Severe Heat', date: 'Jul 08', status: 'Accepted', amount: 150, icon: '☀️' },
-  { id: 3, type: 'High Pollution', date: 'Jun 30', status: 'Rejected', amount: 0, icon: '💨' },
-  { id: 4, type: 'Storm Alert', date: 'Jun 25', status: 'Processing', amount: 200, icon: '🌩️' },
+  { id: 1, type: 'Heavy Rain', date: 'Jul 12', status: 'Accepted', amount: 320 },
+  { id: 2, type: 'Severe Heat', date: 'Jul 08', status: 'Accepted', amount: 150 },
+  { id: 3, type: 'High Pollution', date: 'Jun 30', status: 'Rejected', amount: 0 },
+  { id: 4, type: 'Storm Alert', date: 'Jun 25', status: 'Processing', amount: 200 },
 ];
 
 const INITIAL_EARNINGS = [
@@ -43,15 +43,15 @@ export function AppProvider({ children }) {
     return newPolicy;
   };
 
-  const requestClaim = (type, icon) => {
+  const requestClaim = (type) => {
     const types = {
-      'Heavy Rain': { amount: 320, icon: '🌧️' },
-      'Severe Heat': { amount: 150, icon: '☀️' },
-      'High Pollution': { amount: 200, icon: '💨' },
-      'Storm Alert': { amount: 250, icon: '🌩️' },
+      'Heavy Rain': { amount: 320 },
+      'Severe Heat': { amount: 150 },
+      'High Pollution': { amount: 200 },
+      'Storm Alert': { amount: 250 },
     };
 
-    const info = types[type] || { amount: 100, icon: '🌦️' };
+    const info = types[type] || { amount: 100 };
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 
@@ -61,7 +61,6 @@ export function AppProvider({ children }) {
       date: dateStr,
       status: 'Processing',
       amount: info.amount,
-      icon: info.icon,
     };
 
     const updatedClaims = [newClaim, ...claims];

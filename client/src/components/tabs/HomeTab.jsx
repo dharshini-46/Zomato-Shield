@@ -5,7 +5,20 @@ import { getUser } from '../../api';
 import { useApp } from '../../AppContext';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Fix Leaflet default icon paths (required for Vite/webpack)
+const Icons = {
+  Rain: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>,
+  Heat: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>,
+  Pollution: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M2 18h10"/><path d="M2 21h10"/></svg>,
+  Storm: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 2v9h4l-3 11v-9H8l3-11z"/></svg>,
+  Check: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>,
+  XBox: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  Info: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+  Map: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>,
+  Bot: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>,
+  Game: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M8 10v4"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/></svg>,
+};
+
+// Fix Leaflet default icon paths
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -66,9 +79,9 @@ const RISK_DATA = [
 ];
 
 const SIM_TYPES = [
-  { label: 'Simulate Rain', icon: '🌧️', type: 'Heavy Rain', result: 'approved', amount: 320, color: '#3b82f6', bg: '#eff6ff' },
-  { label: 'Simulate Heat', icon: '🔥', type: 'Severe Heat', result: 'approved', amount: 150, color: '#f97316', bg: '#fff7ed' },
-  { label: 'Simulate Pollution', icon: '😷', type: 'High Pollution', result: 'rejected', amount: 0, color: '#64748b', bg: '#f1f5f9' },
+  { label: 'Simulate Rain', icon: Icons.Rain, type: 'Heavy Rain', result: 'approved', amount: 320, color: '#3b82f6', bg: '#eff6ff' },
+  { label: 'Simulate Heat', icon: Icons.Heat, type: 'Severe Heat', result: 'approved', amount: 150, color: '#f97316', bg: '#fff7ed' },
+  { label: 'Simulate Pollution', icon: Icons.Pollution, type: 'High Pollution', result: 'rejected', amount: 0, color: '#64748b', bg: '#f1f5f9' },
 ];
 
 function MapCenterUpdater({ center }) {
@@ -79,7 +92,7 @@ function MapCenterUpdater({ center }) {
 
 export default function HomeTab({ setActiveTab }) {
   const user = getUser();
-  const { policy, claims, requestClaim } = useApp();
+  const { policy, requestClaim } = useApp();
   const [claimModal, setClaimModal] = useState(false);
   const [claimSuccess, setClaimSuccess] = useState('');
   const [simResult, setSimResult] = useState(null);
@@ -96,11 +109,21 @@ export default function HomeTab({ setActiveTab }) {
 
   const CLAIM_TYPES = ['Heavy Rain', 'Severe Heat', 'High Pollution', 'Storm Alert'];
 
+  const getClaimIcon = (type) => {
+    switch (type) {
+      case 'Heavy Rain': return Icons.Rain;
+      case 'Severe Heat': return Icons.Heat;
+      case 'High Pollution': return Icons.Pollution;
+      case 'Storm Alert': return Icons.Storm;
+      default: return Icons.Info;
+    }
+  };
+
   const handleClaimRequest = (type) => {
     if (!policy) return;
     requestClaim(type);
     setClaimModal(false);
-    setClaimSuccess(`Claim for "${type}" submitted ✅`);
+    setClaimSuccess(`Claim for "${type}" submitted`);
     setTimeout(() => setClaimSuccess(''), 4000);
   };
 
@@ -119,16 +142,17 @@ export default function HomeTab({ setActiveTab }) {
 
       {/* Toast */}
       {claimSuccess && (
-        <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#22c55e', color: '#fff', padding: '12px 20px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: '700', zIndex: 999, boxShadow: '0 8px 20px rgba(34,197,94,0.3)', whiteSpace: 'nowrap' }}>
-          {claimSuccess}
+        <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#22c55e', color: '#fff', padding: '12px 20px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: '700', zIndex: 999, boxShadow: '0 8px 20px rgba(34,197,94,0.3)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {Icons.Check} {claimSuccess}
         </div>
       )}
 
       {/* Simulation Result Toast */}
       {simResult && (
         <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 40px)', maxWidth: '440px', background: simResult.result === 'approved' ? '#dcfce7' : simResult.result === 'no_policy' ? '#fef3c7' : '#fee2e2', borderRadius: '20px', padding: '16px 20px', zIndex: 999, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
-          <div style={{ fontWeight: '800', color: simResult.result === 'approved' ? '#166534' : simResult.result === 'no_policy' ? '#92400e' : '#991b1b', marginBottom: '4px' }}>
-            {simResult.result === 'approved' ? `✅ Claim Approved – ${simResult.icon} ${simResult.type}` : simResult.result === 'no_policy' ? '⚠️ No Active Policy' : `❌ Claim Rejected – ${simResult.icon} ${simResult.type}`}
+          <div style={{ fontWeight: '800', color: simResult.result === 'approved' ? '#166534' : simResult.result === 'no_policy' ? '#92400e' : '#991b1b', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {simResult.result === 'approved' ? Icons.Check : simResult.result === 'no_policy' ? Icons.Info : Icons.XBox}
+            {simResult.result === 'approved' ? `Claim Approved – ${simResult.type}` : simResult.result === 'no_policy' ? 'No Active Policy' : `Claim Rejected – ${simResult.type}`}
           </div>
           <div style={{ fontSize: '0.85rem', color: simResult.result === 'approved' ? '#16a34a' : simResult.result === 'no_policy' ? '#d97706' : '#dc2626' }}>
             {simResult.result === 'approved' ? `₹${simResult.amount} will be credited to your wallet.` : simResult.result === 'no_policy' ? simResult.msg : 'AQI threshold not met for this event.'}
@@ -144,8 +168,8 @@ export default function HomeTab({ setActiveTab }) {
             <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.85rem', marginBottom: '24px' }}>Select the reason for your claim</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {CLAIM_TYPES.map(type => (
-                <button key={type} onClick={() => handleClaimRequest(type)} style={{ width: '100%', padding: '16px', background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '16px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', textAlign: 'left' }}>
-                  {type === 'Heavy Rain' ? '🌧️' : type === 'Severe Heat' ? '☀️' : type === 'High Pollution' ? '💨' : '🌩️'} {type}
+                <button key={type} onClick={() => handleClaimRequest(type)} style={{ width: '100%', padding: '16px', background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '16px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', color: '#111827' }}>
+                  <div style={{ color: '#e23744' }}>{getClaimIcon(type)}</div> {type}
                 </button>
               ))}
             </div>
@@ -160,9 +184,9 @@ export default function HomeTab({ setActiveTab }) {
             {user?.name?.[0]?.toUpperCase() || 'R'}
           </div>
           <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#111827', margin: 0 }}>Hi, {user?.name?.split(' ')[0] || 'Ravi'} 👋</h1>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#111827', margin: 0 }}>Hi, {user?.name?.split(' ')[0] || 'Ravi'}</h1>
             <div style={{ fontSize: '0.75rem', color: '#e23744', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              📍 {user?.city || 'Chennai'} · Earnings protected by AI
+              {user?.city || 'Chennai'} · Earnings protected by AI
             </div>
           </div>
         </div>
@@ -186,7 +210,7 @@ export default function HomeTab({ setActiveTab }) {
       {policy ? (
         <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '20px', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span>⚠️</span>
+            <div style={{ color: '#d97706' }}>{Icons.Info}</div>
             <div>
               <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#92400e' }}>High risk tomorrow</div>
               <div style={{ fontSize: '0.75rem', color: '#92400e', opacity: 0.8 }}>Est. loss: ₹{Math.round(atRisk * 0.7)}</div>
@@ -196,9 +220,12 @@ export default function HomeTab({ setActiveTab }) {
         </div>
       ) : (
         <div style={{ background: '#fff1f2', border: '1px solid #fda4af', borderRadius: '20px', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <div>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#9f1239' }}>No active policy</div>
-            <div style={{ fontSize: '0.75rem', color: '#9f1239', opacity: 0.8 }}>Subscribe to protect your earnings</div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ color: '#e23744' }}>{Icons.Info}</div>
+            <div>
+              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#9f1239' }}>No active policy</div>
+              <div style={{ fontSize: '0.75rem', color: '#9f1239', opacity: 0.8 }}>Subscribe to protect your earnings</div>
+            </div>
           </div>
           <button onClick={() => setActiveTab('Policy')} style={{ background: '#e23744', color: '#fff', border: 'none', borderRadius: '100px', padding: '8px 14px', fontSize: '0.75rem', fontWeight: '700' }}>Get Shield</button>
         </div>
@@ -207,13 +234,16 @@ export default function HomeTab({ setActiveTab }) {
       {/* ─── LIVE RISK MAP ─── */}
       <div style={{ background: '#fff', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
         <div style={{ padding: '20px 20px 0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>🗺️ Live Risk Map</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ color: '#111827' }}>{Icons.Map}</div>
+            <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>Live Risk Map</h2>
+          </div>
           <div style={{ background: '#dcfce7', color: '#16a34a', padding: '4px 10px', borderRadius: '100px', fontSize: '0.65rem', fontWeight: '800', letterSpacing: '0.5px' }}>LIVE</div>
         </div>
         <div style={{ height: '300px', width: '100%', borderRadius: '0 0 32px 32px', overflow: 'hidden' }}>
           {mapError ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '8px', color: '#9ca3af', background: '#f8f9fa' }}>
-              <span style={{ fontSize: '2rem' }}>🗺️</span>
+              <div style={{ color: '#9ca3af', marginBottom: '4px' }}>{Icons.Map}</div>
               <span style={{ fontWeight: '700' }}>Map unavailable</span>
             </div>
           ) : (
@@ -244,25 +274,28 @@ export default function HomeTab({ setActiveTab }) {
 
       {/* ─── AI PREDICTION CARD ─── */}
       <div style={{ background: '#fff', borderRadius: '32px', padding: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-          <div style={{ background: '#e23744', color: '#fff', padding: '4px', borderRadius: '6px' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ background: '#e23744', color: '#fff', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {Icons.Bot}
           </div>
-          <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>🤖 AI Prediction</h2>
+          <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>AI Prediction</h2>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
-            { icon: '🌧️', title: 'Heavy rain expected tomorrow', sub: 'Probability: 82%', loss: 300, color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
-            { icon: '☀️', title: 'Heatwave alert next 3 days', sub: 'Temperature >42°C', loss: 150, color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
-            { icon: '😷', title: 'AQI above 200 predicted', sub: 'Pollution spike expected', loss: 80, color: '#64748b', bg: '#f1f5f9', border: '#cbd5e1' },
+            { icon: Icons.Rain, title: 'Heavy rain expected tomorrow', sub: 'Probability: 82%', loss: 300, color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
+            { icon: Icons.Heat, title: 'Heatwave alert next 3 days', sub: 'Temperature >42°C', loss: 150, color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
+            { icon: Icons.Pollution, title: 'AQI above 200 predicted', sub: 'Pollution spike expected', loss: 80, color: '#64748b', bg: '#f1f5f9', border: '#cbd5e1' },
           ].map((a, i) => (
             <div key={i} style={{ background: a.bg, borderRadius: '20px', padding: '16px 20px', borderLeft: `4px solid ${a.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <span style={{ fontSize: '1.6rem' }}>{a.icon}</span>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                <div style={{ color: a.color }}>{a.icon}</div>
                 <div>
-                  <div style={{ fontWeight: '700', color: '#111827', fontSize: '0.9rem' }}>⚠️ {a.title}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '2px' }}>{a.sub}</div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#e23744' }}>Est. loss: ₹{a.loss}</div>
+                  <div style={{ fontWeight: '700', color: '#111827', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ color: '#d97706' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    {a.title}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', margin: '2px 0 2px 20px' }}>{a.sub}</div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#e23744', marginLeft: '20px' }}>Est. loss: ₹{a.loss}</div>
                 </div>
               </div>
             </div>
@@ -272,8 +305,9 @@ export default function HomeTab({ setActiveTab }) {
 
       {/* ─── SIMULATION PANEL ─── */}
       <div style={{ background: '#fff', borderRadius: '32px', padding: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>🎮 Simulation Panel</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+          <div style={{ color: '#111827' }}>{Icons.Game}</div>
+          <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>Simulation Panel</h2>
         </div>
         <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '20px' }}>Simulate conditions to test your coverage and see how claims are processed.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -282,10 +316,10 @@ export default function HomeTab({ setActiveTab }) {
               onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
               onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span style={{ fontSize: '1.5rem' }}>{s.icon}</span>
+                <div style={{ color: s.color }}>{s.icon}</div>
                 <span style={{ fontWeight: '800', color: '#111827', fontSize: '1rem' }}>{s.label}</span>
               </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={s.color}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="white"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             </button>
           ))}
         </div>
@@ -293,8 +327,8 @@ export default function HomeTab({ setActiveTab }) {
 
       {/* ─── EARNINGS PROTECTION ─── */}
       <div style={{ background: '#fff', borderRadius: '32px', padding: '28px 24px', boxShadow: '0 10px 40px rgba(0,0,0,0.04)', marginBottom: '20px', border: '1px solid #f3f4f6' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-          <div style={{ background: '#e23744', color: '#fff', padding: '4px', borderRadius: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+          <div style={{ background: '#e23744', color: '#fff', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
           <h2 style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1.1rem' }}>Earnings Protection</h2>

@@ -1,6 +1,10 @@
 import React from 'react';
 import { useApp } from '../../AppContext';
 
+const Icons = {
+  Banknote: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>,
+};
+
 export default function EarningsTab({ setActiveTab }) {
   const { earnings } = useApp();
   const total = earnings.reduce((s, e) => s + e.amount, 0);
@@ -37,8 +41,8 @@ export default function EarningsTab({ setActiveTab }) {
       <h2 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111827', marginBottom: '16px' }}>Payout Breakdown</h2>
 
       {earnings.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 24px', color: '#9ca3af' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '12px' }}>💰</div>
+        <div style={{ textAlign: 'center', padding: '60px 24px', color: '#9ca3af', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div style={{ color: '#9ca3af' }}>{Icons.Banknote}</div>
           <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>No payouts yet</div>
           <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>When a claim is accepted, payouts will appear here.</div>
         </div>

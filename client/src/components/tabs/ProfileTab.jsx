@@ -4,11 +4,21 @@ import { useApp } from '../../AppContext';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 
+const Icons = {
+  Award: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>,
+  Star: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  Shield: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  Wallet: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>,
+  Activity: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  Trophy: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>,
+  List: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+};
+
 const BADGES = [
-  { icon: '🎖️', label: 'Low Risk Hero', desc: 'Stayed safe for 7+ days' },
-  { icon: '⭐', label: 'Safe Performer', desc: 'Top 5% of safe workers' },
-  { icon: '🛡️', label: 'Shield Veteran', desc: 'Active policy for 30+ days' },
-  { icon: '💰', label: 'Smart Earner', desc: 'Claimed 3+ payouts' },
+  { icon: Icons.Award, label: 'Low Risk Hero', desc: 'Stayed safe for 7+ days', color: '#3b82f6' },
+  { icon: Icons.Star, label: 'Safe Performer', desc: 'Top 5% of safe workers', color: '#f59e0b' },
+  { icon: Icons.Shield, label: 'Shield Veteran', desc: 'Active policy for 30+ days', color: '#16a34a' },
+  { icon: Icons.Wallet, label: 'Smart Earner', desc: 'Claimed 3+ payouts', color: '#8b5cf6' },
 ];
 
 export default function ProfileTab() {
@@ -52,8 +62,8 @@ export default function ProfileTab() {
           {user?.name?.[0]?.toUpperCase() || 'R'}
         </div>
         <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#111827', margin: '0 0 8px 0' }}>{user?.name || 'Ravi Kumar'}</h2>
-        <div style={{ background: '#dcfce7', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800' }}>
-          🛡️ Zomato Partner
+        <div style={{ background: '#dcfce7', color: '#16a34a', padding: '6px 14px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '12px', height: '12px' }}>{Icons.Shield}</span> Zomato Partner
         </div>
       </div>
 
@@ -70,10 +80,14 @@ export default function ProfileTab() {
 
       {/* Claims Trend Chart */}
       <div style={{ background: '#fff', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#111827', marginBottom: '16px' }}>📊 Claims Trend</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ color: '#111827' }}>{Icons.Activity}</div>
+          <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#111827', margin: 0 }}>Claims Trend</h3>
+        </div>
+        
         {claims.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '32px', color: '#9ca3af' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📋</div>
+          <div style={{ textAlign: 'center', padding: '32px', color: '#9ca3af', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <div style={{ color: '#9ca3af' }}>{Icons.List}</div>
             <div style={{ fontWeight: '600' }}>No claims data yet</div>
           </div>
         ) : (
@@ -105,11 +119,14 @@ export default function ProfileTab() {
 
       {/* Achievements / Badges */}
       <div style={{ background: '#fff', borderRadius: '28px', padding: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#111827', marginBottom: '16px' }}>🏆 Achievements</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ color: '#111827' }}>{Icons.Trophy}</div>
+          <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#111827', margin: 0 }}>Achievements</h3>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {BADGES.map((b, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', background: '#f8f9fa', borderRadius: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fff', border: '2px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', flexShrink: 0 }}>{b.icon}</div>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fff', border: '2px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: b.color, flexShrink: 0 }}>{b.icon}</div>
               <div>
                 <div style={{ fontWeight: '800', color: '#111827', fontSize: '0.95rem' }}>{b.label}</div>
                 <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{b.desc}</div>
