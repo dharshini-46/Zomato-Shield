@@ -1,160 +1,40 @@
 Zomato Shield – AI Powered Parametric Insurance
 Problem Overview
 
-Delivery partners working with platforms like Zomato face frequent income loss due to external disruptions such as heavy rain, extreme heat, and pollution. These factors reduce their working hours, directly impacting their earnings. Currently, there is no structured system that protects their income against such uncontrollable events.
-
-Zomato Shield addresses this gap by providing an AI-powered parametric insurance solution focused solely on income protection.
+Delivery partners working with platforms like Zomato often face unpredictable income loss due to external disruptions such as heavy rain, extreme heat, and high pollution levels. These factors directly reduce their working hours and, in turn, their earnings. Unlike salaried employees, gig workers do not have a structured financial safety net to protect them during such events. Zomato Shield addresses this gap by introducing an AI-powered parametric insurance system focused entirely on income protection.
 
 Persona & Scenarios
-Persona:
 
-Food delivery partner (Zomato rider)
-
-Works daily with variable hours and earnings
-
-Dependent on external conditions for income stability
-
-Scenario Examples:
-
-Heavy rainfall reduces order volume leading to income drop
-
-Extreme heat limits working hours resulting in fewer deliveries
-
-High pollution levels restrict outdoor work
+The primary user of this platform is a food delivery partner who works daily with variable hours and income. Their earnings are highly dependent on external environmental conditions. For instance, heavy rainfall can reduce order demand, extreme heat can limit their ability to work for long hours, and high pollution levels can discourage outdoor activity. These real-world scenarios highlight the need for an automated income protection system.
 
 Application Workflow
 
-User registers and logs into the platform
-
-User views available weekly insurance plans
-
-User subscribes to a selected policy
-
-System monitors disruption triggers (weather, environment)
-
-AI predicts risk levels and potential income loss
-
-User can simulate or request a claim
-
-Claim is validated and processed automatically
-
-Payout (simulated) is credited and recorded in earnings
-
-All activities are tracked in dashboard and history
+The application begins with user registration and login, followed by the ability to view and subscribe to available weekly insurance plans. Once subscribed, the system continuously monitors predefined disruption triggers such as weather and environmental conditions. AI models predict risk levels and estimate potential income loss. The user can simulate events or request claims, which are then validated and processed automatically. The payout is simulated and credited to the user’s earnings, and all activities are tracked within the dashboard and history sections.
 
 Weekly Premium Model
 
-The platform uses a weekly subscription model aligned with gig workers’ earning cycles
-
-Premium is calculated based on:
-
-City risk level
-
-Historical disruption frequency
-
-User’s working hours and income
-
-Example:
-
-Low-risk area results in lower premium
-
-High-risk area results in higher premium
+Zomato Shield follows a weekly subscription model to align with the earning cycle of gig workers. The premium amount is dynamically calculated based on factors such as the user’s city, historical disruption frequency in that region, and their daily working hours and income. For example, users operating in low-risk areas are charged lower premiums, while those in high-risk zones may have slightly higher premiums.
 
 Parametric Triggers
 
-The system uses predefined triggers instead of manual claim verification:
-
-Rainfall intensity
-
-Temperature (extreme heat)
-
-Air Quality Index (pollution levels)
-
-Trigger Logic:
-
-If a threshold is exceeded (for example, heavy rain), the system considers it a valid disruption and enables claim processing.
+The platform uses parametric triggers instead of traditional claim verification methods. These triggers include rainfall intensity, temperature levels indicating extreme heat, and air quality index values representing pollution. When any of these parameters exceed predefined thresholds, the system automatically considers it a valid disruption and enables claim processing without requiring manual proof.
 
 AI/ML Integration Plan
 
-Dynamic Premium Calculation:
-AI adjusts weekly premium based on location risk and historical data
-
-Risk Prediction:
-Predicts upcoming disruptions and estimates income loss
-
-Fraud Detection:
-
-Detects unusual claim patterns
-
-Prevents duplicate claims
-
-Validates user activity and location (simulated)
+Artificial intelligence is integrated into multiple parts of the system. It is used for dynamic premium calculation by analyzing location-based risk and historical data. It also powers risk prediction, allowing the system to forecast potential disruptions and estimate income loss. Additionally, AI is used for fraud detection by identifying unusual claim patterns, preventing duplicate claims, and validating user activity and location in a simulated environment.
 
 Tech Stack
 
-Frontend: React (Vite), HTML, CSS
-
-Backend: Node.js, Express.js (simulation-based)
-
-Maps: Leaflet.js
-
-Charts: Recharts
-
-State Management: LocalStorage, React Hooks
-
-Deployment: Vercel
+The platform is built using a modern technology stack. The frontend is developed using React (Vite) for a fast and responsive user interface, while backend logic is simulated using Node.js and Express. Leaflet.js is used to implement the live risk map, and charting libraries are used for analytics visualization. State management is handled using localStorage and React hooks. The application is deployed using Vercel.
 
 Development Plan
-Phase 1: Ideation & Design
 
-Problem analysis
-
-Persona definition
-
-Workflow planning
-
-UI design
-
-Phase 2: Core Development
-
-Authentication system
-
-Policy management
-
-Claim simulation
-
-Dashboard implementation
-
-Phase 3: Advanced Features
-
-AI prediction module
-
-Risk map integration
-
-Fraud detection logic
-
-UI enhancements
+The development process was divided into three phases. The first phase focused on ideation, including problem analysis, persona definition, workflow design, and UI planning. The second phase involved core development such as authentication, policy management, claim simulation, and dashboard implementation. The final phase added advanced features like AI prediction, risk map integration, fraud detection logic, and UI enhancements.
 
 Key Highlights
 
-Focuses strictly on income protection (not health or vehicle insurance)
-
-Uses parametric triggers for automated claim processing
-
-Includes AI-driven insights and predictions
-
-Designed with a clean and intuitive dashboard
-
-Built as a scalable prototype for real-world deployment
+Zomato Shield focuses exclusively on income protection rather than health or vehicle insurance. It leverages parametric triggers for automated claim processing and integrates AI-driven insights to improve decision-making. The platform features a clean and intuitive dashboard and is designed as a scalable prototype that can be extended into a real-world solution.
 
 Future Enhancements
 
-Integration with real-time weather APIs
-
-Advanced machine learning models for risk prediction
-
-Real payment gateway integration
-
-Mobile application support
-
-Deployment of backend on scalable cloud infrastructure
+Future improvements include integrating real-time weather and environmental APIs, enhancing machine learning models for more accurate risk prediction, and implementing advanced fraud detection mechanisms. The platform can also be extended with real payment gateway integration, mobile application support, and deployment of the backend on scalable cloud infrastructure.
