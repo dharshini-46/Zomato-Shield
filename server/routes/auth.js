@@ -12,7 +12,8 @@ router.post('/signup', async (req, res) => {
   try {
     const { name, email, password, city, avgDailyIncome, workingHours } = req.body;
 
-    if (!name || !email || !password || !city || !avgDailyIncome || !workingHours) {
+    // ✅ FIXED VALIDATION (removed extra required fields)
+    if (!name || !email || !password || !city) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
@@ -23,28 +24,41 @@ router.post('/signup', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = {
       id: uuidv4(),
       name,
       email,
       password: hashedPassword,
       city: city.toLowerCase(),
-      avgDailyIncome: Number(avgDailyIncome),
-      workingHours: Number(workingHours),
-      role: 'worker', // 'worker' or 'admin'
+
+      // ✅ SAFE DEFAULTS (no error if missing)
+      avgDailyIncome: avgDailyIncome ? Number(avgDailyIncome) : 0,
+      workingHours: workingHours ? Number(workingHours) : 0,
+
+      role: 'worker',
       createdAt: Date.now(),
     };
 
     db.users.push(user);
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.status(201).json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, city: user.city, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        city: user.city,
+        role: user.role
+      },
     });
+
   } catch (err) {
     res.status(500).json({ error: 'Internal server error.' });
   }
@@ -69,14 +83,23 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, city: user.city, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        city: user.city,
+        role: user.role
+      },
     });
+
   } catch (err) {
     res.status(500).json({ error: 'Internal server error.' });
   }
@@ -86,6 +109,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', require('../middleware/auth').authMiddleware, (req, res) => {
   const user = db.users.find((u) => u.id === req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found.' });
+
   res.json({
     id: user.id,
     name: user.name,
