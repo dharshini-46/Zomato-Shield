@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:5000';
+export const BASE_URL = 'https://zomato-shield-4.onrender.com';
 const API_BASE = `${BASE_URL}/api`;
 
 function getToken() {
@@ -54,7 +54,7 @@ async function apiFetch(path, options = {}) {
     return data;
   } catch (err) {
     if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
-      throw new Error('Network Error: Unable to connect to the backend server. Please ensure the server is running on http://localhost:5000.');
+      throw new Error('Network Error: Unable to connect to the backend server.');
     }
     throw err;
   }
