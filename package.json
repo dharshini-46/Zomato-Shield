@@ -2,8 +2,8 @@
   "dependencies": {
     "leaflet": "^1.9.4",
     "react-leaflet": "^5.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
-}
-"scripts": {
-  "start": "node server.js"
 }
